@@ -16,7 +16,8 @@ Está pensada para asignaturas universitarias que cuesta motivar (métodos de in
 - **Dos parciales**: al cerrar el primero, los marcadores vuelven a 0 y el historial se conserva.
 - **Vista del profesor** (privada) con ranking, estudiantes sin fichas y correcciones manuales.
 - **Excel** con una hoja por asignatura (fichas y puntos de cada parcial y total) y una hoja *Registro* con fecha y hora de cada participación.
-- **Guardado en este ordenador o en Google Sheets**, a elegir.
+- **Banco de preguntas por tema o semana**: la tarjeta gira y muestra la respuesta al dar la ficha.
+- **Acceso con contraseña** desde cualquier ordenador, con los datos en tu Google Sheets, o uso sin conexión.
 - **Copias de seguridad** en JSON para restaurar todo el curso o moverlo a otro ordenador.
 
 ## Uso
@@ -27,30 +28,44 @@ Está pensada para asignaturas universitarias que cuesta motivar (métodos de in
    - un CSV con columnas `Nombre;Apellidos`.
 3. Entra en la asignatura, elige la modalidad y empieza a dar fichas. *Deshacer* (o Ctrl/Cmd + Z) retira la última.
 
-## Dónde se guardan los datos (importante)
+## Dónde se guardan los datos
 
-Puedes elegirlo en **Inicio → Dónde se guardan los datos** (también aparece en *Configurar* dentro de cada asignatura):
+La primera vez que abres la app eliges entre dos opciones:
 
-- **Este ordenador**: los datos se guardan en el navegador (`localStorage`). Descarga una **copia de seguridad** al menos una vez por semana (*Datos y copias → Descargar copia*); la app te avisa si no lo has hecho. Para cambiar de ordenador, descarga la copia y usa *Restaurar copia* en el otro.
-- **Google Sheets**: cada cambio se guarda en una hoja de tu Google Drive. Puedes abrir la app desde cualquier ordenador o móvil y ver las notas directamente en la hoja. El navegador conserva además una copia, así que si un día falla la conexión puedes seguir dando fichas y se suben cuando vuelve.
+- **Conectar con hoja de cálculo** (recomendado si usas varios ordenadores). Tus asignaturas, fichas y preguntas se guardan en tu Google Sheets. En cualquier ordenador del aula entras con tu **contraseña** y ves todo el historial. Requiere una configuración previa, una sola vez.
+- **Usar sin conexión**. Los datos se quedan solo en ese navegador. Sirve para probar o para un día sin internet; descarga copias de seguridad con frecuencia.
 
-### Guardar en Google Sheets (se configura una vez, unos 5 minutos)
+### Configurar la hoja (una sola vez, unos 5 minutos)
 
-1. **La hoja.** Usa la hoja que ya está creada en tu Drive (*Fichas de participación · datos*) o crea una importando `google-sheets/Fichas_participacion.xlsx` (Drive → Nuevo → Subir archivo → abrir con Hojas de cálculo de Google).
-2. **El script.** En la hoja: *Extensiones → Apps Script*. Borra lo que haya y pega todo el contenido de `google-sheets/Codigo.gs`.
-3. **La clave.** Cambia `CAMBIA-ESTA-CLAVE` por una palabra secreta tuya y guarda (icono del disquete).
-4. **Publicar.** *Implementar → Nueva implementación →* engranaje *→ Aplicación web*. En **Ejecutar como** elige *Yo* y en **Quién tiene acceso** elige *Cualquier usuario*. Pulsa *Implementar* y autoriza con tu cuenta. Google mostrará un aviso de «app no verificada» porque el script es tuyo: *Configuración avanzada → Ir a … (no seguro)*.
-5. **Conectar.** Copia la URL que termina en `/exec`. En la app: *Inicio → Dónde se guardan los datos → Google Sheets*, pega la URL y la clave y pulsa **Conectar**.
+La app te guía en *Conectar con hoja de cálculo → Configurar ahora*:
 
-Al conectar, si la hoja ya tiene datos, la app pregunta si quieres combinarlos con los del ordenador, usar solo los de la hoja o sustituirlos.
+1. **Crea la hoja.** Sube `google-sheets/Fichas_participacion.xlsx` a tu Google Drive y ábrela con Hojas de cálculo de Google.
+2. **Pega el script.** En la hoja: *Extensiones → Apps Script*. Borra lo que haya y pega `google-sheets/Codigo.gs`.
+3. **Elige tu contraseña.** Escríbela en la línea `const CLAVE = '…'` y guarda.
+4. **Publica.** *Implementar → Nueva implementación →* engranaje *→ Aplicación web*. **Ejecutar como:** Yo. **Quién tiene acceso:** Cualquier usuario. Autoriza con tu cuenta (si sale «app no verificada»: *Configuración avanzada → Ir a…*).
+5. **Conecta.** Pega en la app la dirección que termina en `/exec` y tu contraseña, y pulsa *Probar y entrar*.
+6. **Opcional pero recomendado:** descarga `config.js` desde la app y súbelo a este repositorio, sustituyendo el que hay. A partir de entonces, en cualquier ordenador la app solo pedirá la contraseña.
 
-La hoja tiene tres pestañas:
+### En el aula
 
-- **Notas**: fichas y puntos de cada estudiante por parcial. Se reescribe en cada guardado, así que copia los datos a otro sitio antes de tocarlos.
-- **Registro**: fecha y hora de cada participación.
-- **_datos** (oculta): la copia completa que usa la app. No la edites.
+- Abre la app (por ejemplo, desde un enlace en Canvas), escribe tu contraseña y deja **sin marcar** «Recordar en este ordenador».
+- Al terminar, pulsa **Cerrar sesión**: los cambios pendientes se guardan en la hoja y se borra la copia del ordenador. Si cierras el navegador sin hacerlo, la copia también se borra.
+- Tras 8 contraseñas incorrectas seguidas, el script bloquea el acceso 10 minutos.
 
-La URL y la clave funcionan como una contraseña: no las publiques. Si modificas el código del script, usa *Implementar → Gestionar implementaciones →* lápiz *→ Nueva versión* para conservar la misma URL. Si usas una cuenta de Google de la universidad, puede que no deje elegir *Cualquier usuario*; en ese caso usa una cuenta personal.
+La hoja tiene tres pestañas: **Notas** (fichas, puntos y respuestas por estudiante; se reescribe en cada guardado), **Registro** (fecha, hora, resultado y pregunta de cada participación) y **_datos** (oculta; la copia completa que usa la app, no la edites).
+
+La dirección del script no es secreta: sin la contraseña no da acceso a nada. La contraseña sí: no la publiques. Si modificas el script, usa *Implementar → Gestionar implementaciones →* lápiz *→ Nueva versión* para conservar la misma dirección. Algunas cuentas de Google de universidades no permiten elegir «Cualquier usuario»; en ese caso usa una cuenta personal.
+
+## Banco de preguntas
+
+Para que la ficha dependa de una respuesta contrastable y no del criterio del momento, cada asignatura puede tener preguntas cortas por **tema o semana**:
+
+- En *Configurar → Banco de preguntas* subes un archivo **CSV, Excel o JSON** con las columnas **Tema** (o Semana), **Pregunta**, **Respuesta** y, opcionalmente, **Explicación**. Hay una plantilla en `google-sheets/plantilla_preguntas.csv` y en el botón *Descargar plantilla*. También puedes añadirlas una a una.
+- En clase eliges el tema y pulsas **Sacar pregunta**. Eliges quién responde con cualquiera de las tres modalidades. Pulsas **Correcta · +1 ficha** o **Incorrecta**, y la tarjeta **gira y muestra la respuesta** a toda la clase. *Mostrar respuesta* la gira sin asignar a nadie.
+- Las preguntas usadas se marcan para no repetirlas. Cuando se agotan, se reutilizan empezando por las más antiguas, y puedes volver a marcarlas como no usadas por tema.
+- El Excel y la hoja registran qué pregunta respondió cada estudiante y si acertó.
+
+Formato JSON aceptado: una lista de objetos `{"tema": "...", "pregunta": "...", "respuesta": "...", "explicacion": "..."}` (o `{"preguntas": [...]}`).
 
 El Excel necesita conexión a internet la primera vez, porque carga la librería [SheetJS](https://sheetjs.com/) desde cdnjs. Sin conexión se descarga un CSV que Excel abre igual.
 
@@ -58,9 +73,11 @@ El Excel necesita conexión a internet la primera vez, porque carga la librería
 
 ```
 index.html                               La aplicación completa (HTML, CSS y JavaScript, sin compilación)
+config.js                                Dirección de tu hoja (se genera desde la app)
 img/                                     Banner y las ilustraciones de los cinco títulos
 google-sheets/Codigo.gs                  Script que conecta la app con tu hoja de Google
 google-sheets/Fichas_participacion.xlsx  Plantilla de la hoja (Notas, Registro, _datos)
+google-sheets/plantilla_preguntas.csv    Ejemplo del formato del banco de preguntas
 LICENSE                                  Licencia MIT
 ```
 
@@ -70,6 +87,8 @@ LICENSE                                  Licencia MIT
 - **Criterio absoluto**: no hay plazas limitadas ni comparación pública. El ranking solo aparece en la vista del profesor.
 - **Meta grupal**: la barra de la clase suma las fichas de todo el grupo hacia una recompensa común.
 - **Reparto de oportunidades**: la ruleta y *Elige un amigo* dan turno a quienes no suelen levantar la mano.
+- **Criterio contrastable**: la respuesta correcta se muestra a toda la clase, así la ficha no depende de la percepción de favoritismo.
+- **Feedback de competencia**: al acertar y al subir de nivel, el mensaje habla de lo aprendido, no de los puntos.
 
 ## Licencia
 
